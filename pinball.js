@@ -18,12 +18,27 @@ var CommonMVMatrix;
 var nonCommonMVMatrix;
 var mvMatrix;
 
+var rm_fl;
+var tm_fl;
+var rm_fr;
+var tm_fr;
+
 var u_mvMatrixLoc;
 var u_ctmLoc;
 
 var sm, tm, rm, ctm;
 
 var globalScale = 100;
+
+var xVelocity = 0.025;
+var yVelocity = 0.025;
+var xCenter = 0.73;
+var yCenter = -0.528;
+var extend = 0.05;
+var countl = 0;
+var countr = 0;
+
+
 
 window.onload = function init()
 {
@@ -74,6 +89,33 @@ window.onload = function init()
     u_colorLoc = gl.getUniformLocation( program, "u_color" );
 
     u_ctmLoc = gl.getUniformLocation( program, "u_ctMatrix" );
+    rm_fl = rotateZ(0);
+    tm_fl = translate(-.162, -0.80, 0);
+    rm_fr = rotateZ(0);
+    tm_fr = translate(0.01, -0.80, 0);
+    document.getElementById("Left").onclick = function(){
+      countl = countl + 1;
+      if(countl%2 != 0){
+        tm_fl = translate(-.55, -0.58, 0);
+        rm_fl = rotateZ(30);
+      }
+      else{
+        rm_fl = rotateZ(0);
+        tm_fl = translate(-.162, -0.80, 0);
+      }
+
+      }
+      document.getElementById("Right").onclick = function(){
+        countr = countr + 1;
+        if(countr%2 != 0){
+          rm_fr = rotateZ(-30);
+          tm_fr = translate(.4, -0.653, 0);
+        }
+        else{
+          rm_fr = rotateZ(0);
+          tm_fr = translate(0.01, -0.80, 0);
+        }
+        }
 
     render();
 }
@@ -98,6 +140,7 @@ function setupCircle() {
 }
 function drawCircle(color)
 {
+
     var pm = ortho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
 
     var circleMat = mat4();
@@ -269,10 +312,15 @@ function drawFlippers()
 
 
   var squareMat = mat4();
+
   sm = scalem(0.06, .01, 0);
-  tm = translate(-.162, -0.80, 0);
-  ctm = mult(sm, squareMat);
-  ctm = mult(tm, ctm);
+  //tm = translate(-.162, -0.80, 0);
+
+  ctm = mult(tm_fl, sm);
+  //ctm = mult(sm, ctm);
+  ctm = mult(rm_fl, ctm);
+//  ctm = mult(tm, ctm);
+
   drawSquare(vec3(.3, .3, .3), ctm);
 
 
@@ -280,9 +328,9 @@ function drawFlippers()
     //drawSquare(vec3(.3, .3, .3), ctm);
 
   sm = scalem(0.06, .01, 0);
-  tm = translate(0.01, -0.80, 0);
-  ctm = mult(sm, squareMat);
-  ctm = mult(tm, ctm);
+  //tm = translate(0.01, -0.80, 0);
+  ctm = mult(tm_fr, sm);
+  ctm = mult(rm_fr, ctm);
   drawSquare(vec3(.3, .3, .3), ctm);
 
 
@@ -307,14 +355,45 @@ function drawScore()
 {
 
 }
+
+
+function animate () {
+
+    // increment xCenter and yCenter
+    // write your code here
+    xCenter += xVelocity;
+    yCenter += yVelocity;
+
+    // check if xCenter/yCenter is out of bound (use extend),
+    // if yes, keep it in bound and reverse the xVelocity/yVelocity
+    // write your code here
+    if (xCenter + 0.95 >= 1.00){
+      xCenter = extend;
+      xVelocity *= -1.0;
+
+    }
+    if (xCenter - 0.95 <= -1.00){
+      xCenter = -1.0 * extend;
+      xVelocity *= -1.0;
+
+    }
+    if (yCenter + 0.95 >= 1.00){
+      yCenter = extend;
+      yVelocity *= -1.0;
+
+    }
+    if (yCenter - 0.95 <= -1.00){
+      yCenter = -1.0 * extend;
+      yVelocity *= -1.0;
+
+    }
+
+}
 var render = function()
 {
 
-//  document.getElementById("Left").onclick = function(){
-//      var rm = rotateZ(30);
-//      ctm = mult(rm, ctm);
-//      drawSquare(vec3(.3, .3, .3), ctm);
-//    }
+
     requestAnimFrame(render);
+
     drawAll();
 }
