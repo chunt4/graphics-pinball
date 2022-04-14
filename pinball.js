@@ -18,7 +18,7 @@ var CommonMVMatrix;
 var nonCommonMVMatrix;
 var mvMatrix;
 
-var u_mvMatrixLoc;   
+var u_mvMatrixLoc;
 var u_ctmLoc;
 
 var sm, tm, rm, ctm;
@@ -96,7 +96,7 @@ function setupCircle() {
         // circleVertexPositionData.push(vec4(Math.cos(theta+increment), 0.0, Math.sin(theta+increment), 1.0));
     }
 }
-function drawCircle(color) 
+function drawCircle(color)
 {
     var pm = ortho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
 
@@ -142,7 +142,7 @@ function drawSquare(color, ctm)
     // gl.enableVertexAttribArray( a_positionLoc );
     gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
     gl.vertexAttribPointer( a_positionLoc, 2, gl.FLOAT, false, 0, 0 );
-    
+
     gl.drawArrays( gl.TRIANGLE_FAN, 0, squareVertexPositionData.length );
 }
 function drawTriangle(color, ctm)
@@ -168,17 +168,43 @@ function drawCourt()
 {
     var squareMat = mat4();
 
+    sm = scalem(0.07, .07, 0);
+    tm = translate(-0.35, 0, 0);
+    ctm = mult(sm, squareMat);
+    ctm = mult(tm, ctm);
+    drawSquare(vec3(0, .7, 0), ctm);
+    tm = translate(0.2, 0, 0);
+    ctm = mult(sm, squareMat);
+    ctm = mult(tm, ctm);
+    drawSquare(vec3(0, .7, 0), ctm);
+
+
+    rm = rotateZ(270);
+    tm = translate(-.35, 0.75, 0);
+    ctm = mult(rm, ctm);
+    ctm = mult(tm, ctm);
+    drawTriangle(vec3(.4,0,0), ctm);
+    rm = rotateZ(270);
+    tm = translate(-.33, 0.21, 0);
+    ctm = mult(rm, ctm);
+    ctm = mult(tm, ctm);
+    drawTriangle(vec3(.4,0,0), ctm);
+
     sm = scalem(0.2, 0.1, 0);
     tm = translate(-.4, -.72, 0);
     ctm = mult(sm, squareMat);
     ctm = mult(tm, ctm);
     drawTriangle(vec3(207/255, 185/255, 151/255), ctm);
 
-    rm = rotateY(180);
-    tm = translate(-.15, 0, 0)
+    rm = rotateZ(90);
+    sm = scalem(0.12, 0.22, 0);
+    tm = translate(.25, -.72, 0);
+    ctm = mult(sm, squareMat);
     ctm = mult(rm, ctm);
     ctm = mult(tm, ctm);
     drawTriangle(vec3(207/255, 185/255, 151/255), ctm);
+
+
 
     sm = scalem(0.02, 0.9*0.8, 0);
     tm = translate(0.45, -0.1, 0);
@@ -194,6 +220,8 @@ function drawCourt()
     ctm = mult(sm, squareMat);
     drawSquare(vec3(207/255, 185/255, 151/255), ctm);
 
+
+
 }
 function drawBall()
 {
@@ -202,6 +230,62 @@ function drawBall()
 }
 function drawFlippers()
 {
+
+  var pm = ortho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+  var circleMat = mat4();
+  var scaling_c = 0.016;
+  var sm = scalem(scaling_c, scaling_c, 0);
+  var ctm = mult(sm, circleMat);
+  var tm = translate(-.23, -.8, 0.0);
+  ctm = mult(tm, ctm);
+  ctm = mult(pm, ctm);
+  gl.uniformMatrix4fv(u_ctmLoc, false, flatten(ctm));
+  gl.uniform3fv( u_colorLoc, vec3(.5,.5,.5) );
+  gl.bindBuffer(gl.ARRAY_BUFFER, circleVertexPositionBuffer);
+  gl.vertexAttribPointer( a_positionLoc, 2, gl.FLOAT, false, 0, 0 );
+  gl.drawArrays( gl.TRIANGLE_FAN, 0, 4 );
+  gl.drawArrays( gl.TRIANGLES, 0, circleVertexPositionData.length );
+  gl.drawArrays( gl.TRIANGLE_FAN, 0, circleVertexPositionData.length );
+  gl.drawArrays( gl.TRIANGLE_STRIP, 0, circleVertexPositionData.length );
+
+
+  var pm = ortho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+  var circleMat = mat4();
+  var scaling_c = 0.016;
+  var sm = scalem(scaling_c, scaling_c, 0);
+  var ctm = mult(sm, circleMat);
+  var tm = translate(0.08, -.8, 0.0);
+  ctm = mult(tm, ctm);
+  ctm = mult(pm, ctm);
+  gl.uniformMatrix4fv(u_ctmLoc, false, flatten(ctm));
+  gl.uniform3fv( u_colorLoc, vec3(.5,.5,.5) );
+  gl.bindBuffer(gl.ARRAY_BUFFER, circleVertexPositionBuffer);
+  gl.vertexAttribPointer( a_positionLoc, 2, gl.FLOAT, false, 0, 0 );
+  gl.drawArrays( gl.TRIANGLE_FAN, 0, 4 );
+  gl.drawArrays( gl.TRIANGLES, 0, circleVertexPositionData.length );
+  gl.drawArrays( gl.TRIANGLE_FAN, 0, circleVertexPositionData.length );
+  gl.drawArrays( gl.TRIANGLE_STRIP, 0, circleVertexPositionData.length );
+
+
+
+  var squareMat = mat4();
+  sm = scalem(0.06, .01, 0);
+  tm = translate(-.162, -0.80, 0);
+  ctm = mult(sm, squareMat);
+  ctm = mult(tm, ctm);
+  drawSquare(vec3(.3, .3, .3), ctm);
+
+
+
+    //drawSquare(vec3(.3, .3, .3), ctm);
+
+  sm = scalem(0.06, .01, 0);
+  tm = translate(0.01, -0.80, 0);
+  ctm = mult(sm, squareMat);
+  ctm = mult(tm, ctm);
+  drawSquare(vec3(.3, .3, .3), ctm);
+
+
 
 }
 function drawAll()
@@ -213,9 +297,11 @@ function drawAll()
     //                             vec3(0.0, 0.0, 0.0),
     //                             vec3(0.0, 1.0, 0.0)),
     // CommonMVMatrix);
+    drawFlippers();
     drawBall();
     drawCourt();
-    
+
+
 }
 function drawScore()
 {
@@ -223,6 +309,12 @@ function drawScore()
 }
 var render = function()
 {
+
+//  document.getElementById("Left").onclick = function(){
+//      var rm = rotateZ(30);
+//      ctm = mult(rm, ctm);
+//      drawSquare(vec3(.3, .3, .3), ctm);
+//    }
     requestAnimFrame(render);
     drawAll();
 }
