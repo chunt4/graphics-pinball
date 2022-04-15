@@ -6,6 +6,8 @@ var canvas;
 var vertices = [];
 var u_colorLoc;
 var a_positionLoc;
+var v = [];
+var xCenterb, yCenterb;
 
 var squareVertexPositionData = [];
 var squareVertexPositionBuffer;
@@ -30,10 +32,11 @@ var sm, tm, rm, ctm;
 
 var globalScale = 100;
 
-var xVelocity = 0.025;
-var yVelocity = 0.025;
+var xVelocity = 0.0075;
+var yVelocity = 0.00625;
 var xCenter = 0.73;
-var yCenter = -0.528;
+var yCenter = 0.528;
+
 var extend = 0.05;
 var countl = 0;
 var countr = 0;
@@ -88,6 +91,9 @@ window.onload = function init()
 
     u_colorLoc = gl.getUniformLocation( program, "u_color" );
 
+
+    //u_vCenterLoc = gl.getUniformLocation (program, "u_vCenter");
+
     u_ctmLoc = gl.getUniformLocation( program, "u_ctMatrix" );
     rm_fl = rotateZ(0);
     tm_fl = translate(-.162, -0.80, 0);
@@ -118,6 +124,44 @@ window.onload = function init()
         }
 
     render();
+}
+
+function diffBall(){
+  var p = vec2(0.0, 0.0);
+  rad = 0.05;
+  var theta = Math.PI / 30;
+  v = [p];
+  var x = Math.sin(theta) * rad;
+  var y = Math.cos(theta) * rad;
+  v.push(vec2(rad, 0.0));
+  v.push(vec2(y, x));
+
+
+  v.push(p);
+  v.push(vec2(y, x));
+  theta = Math.PI / 30;
+  x = Math.sin(theta) * rad;
+  y = Math.cos(theta) * rad;
+  v.push(vec2(y, x));
+
+  for(var z = theta; z <= (2 * Math.PI); z = z + (Math.PI / 30) ){
+    v.push(p);
+    v.push(vec2(y, x));
+    x = Math.sin(z) * rad;
+    y = Math.cos(z) * rad;
+    v.push(vec2(y, x));
+  }
+  v.push(vec2(-0.05, -0.05));
+  v.push(vec2(-0.05, 0.05));
+  v.push(vec2(0.05, 0.05));
+  v.push(vec2(0.05, -0.05));
+
+  for (var l = 0; l < v.length; l = l + 3){
+    //gl.uniform3fv(u_ColorLoc, colors[0]);
+    gl.uniform2fv (u_ballCenterLoc, vec2(xCenter, yCenter));
+    gl.drawArrays( gl.TRIANGLE_FAN, l, 3 );
+  }
+  animate();
 }
 
 function setupSquare(vertices, a, b, c, d) {
@@ -169,6 +213,7 @@ function drawCircle(color)
     gl.drawArrays( gl.TRIANGLES, 0, circleVertexPositionData.length );
     gl.drawArrays( gl.TRIANGLE_FAN, 0, circleVertexPositionData.length );
     gl.drawArrays( gl.TRIANGLE_STRIP, 0, circleVertexPositionData.length );
+
 }
 function drawSquare(color, ctm)
 {
@@ -269,6 +314,7 @@ function drawCourt()
 function drawBall()
 {
     // nonCommonMVMatrix = scalem(1, 1, 1);
+
     drawCircle(vec3(0.5, 0.5, 0.5));
 }
 function drawFlippers()
@@ -348,6 +394,7 @@ function drawAll()
     drawFlippers();
     drawBall();
     drawCourt();
+
 
 
 }

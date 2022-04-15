@@ -6,11 +6,13 @@
 <script id="vertex-shader" type="x-shader/x-vertex">
 attribute vec3 a_vPosition;
 uniform mat4 u_ctMatrix;
+//uniform vec2 u_vCenter;
 
 void
 main()
 {
-    gl_Position = u_ctMatrix * vec4(a_vPosition, 1.0);
+    //gl_Position = vec3(u_ctMatrix, 1.0) * a_vPosition ;
+    gl_Position = u_ctMatrix * vec4(a_vPosition, 1.0) ;
 }
 </script>
 
@@ -33,7 +35,7 @@ main()
 </head>
 
 <body>
-
+<p>Play Pinball!</p>
 <canvas id="gl-canvas" width="512" height="512">
 Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
@@ -42,6 +44,7 @@ Oops ... your browser doesn't support the HTML5 canvas element
 
     <button id="Left">Left Flipper</button>
     <button id="Right">Right Flipper</button>
+    <button id="Ball">Release Ball</button>
     <br><br>
 
 </body>
