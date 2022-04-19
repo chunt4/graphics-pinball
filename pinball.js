@@ -32,16 +32,20 @@ var sm, tm, rm, ctm;
 
 var globalScale = 100;
 
-var xVelocity = 0.0075;
-var yVelocity = 0.00625;
-var xCenter = 0.73;
-var yCenter = 0.528;
+var xVelocity = 0.0;
+var yVelocity = 0.02 + (Math.random()/3000);
+var xCenter = 0.528;
+var yCenter = -0.75;
 
 var extend = 0.05;
 var countl = 0;
 var countr = 0;
 
+var release_bool = false;
+var release_change = true;
+var latch_close = false;
 
+var colliderObjects = [];
 
 window.onload = function init()
 {
@@ -95,40 +99,64 @@ window.onload = function init()
     //u_vCenterLoc = gl.getUniformLocation (program, "u_vCenter");
 
     u_ctmLoc = gl.getUniformLocation( program, "u_ctMatrix" );
-    rm_fl = rotateZ(0);
-    tm_fl = translate(-.162, -0.80, 0);
-    rm_fr = rotateZ(0);
-    tm_fr = translate(0.01, -0.80, 0);
-    document.getElementById("Left").onclick = function(){
-      countl = countl + 1;
-      if(countl%2 != 0){
-        tm_fl = translate(-.55, -0.58, 0);
-        rm_fl = rotateZ(30);
-      }
-      else{
-        rm_fl = rotateZ(0);
-        tm_fl = translate(-.162, -0.80, 0);
-      }
+    rm_fl = rotateZ(-10);
+    tm_fl = translate(-.09, -0.688, 0);
+    rm_fr = rotateZ(10);
+    tm_fr = translate(-.055, -0.663, 0);
+    // document.getElementById("Left").onclick = function(){
+    //     countl = countl + 1;
+    //     if(countl%2 != 0){
+    //       tm_fl = translate(-.49, -0.43, 0);
+    //       rm_fl = rotateZ(30);
+    //     }
+    //     else{
+    //       rm_fl = rotateZ(-10);
+    //       tm_fl = translate(-.09, -0.688, 0);
+    //     }
+  
+    //     }
+    //   document.getElementById("Right").onclick = function(){
+    //     countr = countr + 1;
+    //     if(countr%2 != 0){
+    //       rm_fr = rotateZ(-30);
+    //       tm_fr = translate(.369, -0.503, 0);
+    //     }
+    //     else{
+    //       rm_fr = rotateZ(10);
+    //       tm_fr = translate(-.055, -0.663, 0);
+    //     }
+    // }
+    window.addEventListener("keydown", function(event) {
+        if (event.key=="ArrowLeft"){
+            tm_fl = translate(-.49, -0.43, 0);
+            rm_fl = rotateZ(30);
+        }
+        else if (event.key=="ArrowRight"){
+            rm_fr = rotateZ(-30);
+            tm_fr = translate(.369, -0.503, 0);
+        }
+    });
+    window.addEventListener("keyup", function(event){
+        if (event.key=="ArrowLeft"){
+            rm_fl = rotateZ(-10);
+            tm_fl = translate(-.09, -0.688, 0);
+        }
+        else if (event.key=="ArrowRight"){
+            rm_fr = rotateZ(10);
+            tm_fr = translate(-.055, -0.663, 0);
+        }
+    });
 
-      }
-      document.getElementById("Right").onclick = function(){
-        countr = countr + 1;
-        if(countr%2 != 0){
-          rm_fr = rotateZ(-30);
-          tm_fr = translate(.4, -0.653, 0);
-        }
-        else{
-          rm_fr = rotateZ(0);
-          tm_fr = translate(0.01, -0.80, 0);
-        }
-        }
+    document.getElementById("Ball").onclick = function(){
+        release_bool = true;
+    }
 
     render();
 }
 
 function diffBall(){
   var p = vec2(0.0, 0.0);
-  rad = 0.05;
+  var rad = 0.05;
   var theta = Math.PI / 30;
   v = [p];
   var x = Math.sin(theta) * rad;
@@ -188,14 +216,12 @@ function drawCircle(color)
     var pm = ortho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
 
     var circleMat = mat4();
-    var scaling_c = 0.05;
+    var scaling_c = 0.04;
 
     var sm = scalem(scaling_c, scaling_c, 0);
     var ctm = mult(sm, circleMat);
 
-    var trans_hy = 0.73;
-    var trans_hx = 0.528;
-    var tm = translate(trans_hx, -trans_hy, 0.0);
+    var tm = translate(xCenter, yCenter, 0.0);
 
     ctm = mult(tm, ctm);
 
@@ -293,6 +319,14 @@ function drawCourt()
     drawTriangle(vec3(207/255, 185/255, 151/255), ctm);
 
 
+    if ((!release_change && yCenter < 0.65) || latch_close) {
+        sm = scalem(0.02, 0.1, 0);
+        tm = translate(0.45, 0.72, 0);
+        ctm = mult(sm, squareMat);
+        ctm = mult(tm, ctm);
+        drawSquare(vec3(207/255, 185/255, 151/255), ctm);
+        latch_close = true;
+    }
 
     sm = scalem(0.02, 0.9*0.8, 0);
     tm = translate(0.45, -0.1, 0);
@@ -307,6 +341,7 @@ function drawCourt()
     sm = scalem(0.65, 0.9, 0);
     ctm = mult(sm, squareMat);
     drawSquare(vec3(207/255, 185/255, 151/255), ctm);
+
 
 
 
@@ -325,7 +360,7 @@ function drawFlippers()
   var scaling_c = 0.016;
   var sm = scalem(scaling_c, scaling_c, 0);
   var ctm = mult(sm, circleMat);
-  var tm = translate(-.23, -.8, 0.0);
+  var tm = translate(-.27, -.65, 0.0);
   ctm = mult(tm, ctm);
   ctm = mult(pm, ctm);
   gl.uniformMatrix4fv(u_ctmLoc, false, flatten(ctm));
@@ -343,7 +378,7 @@ function drawFlippers()
   var scaling_c = 0.016;
   var sm = scalem(scaling_c, scaling_c, 0);
   var ctm = mult(sm, circleMat);
-  var tm = translate(0.08, -.8, 0.0);
+  var tm = translate(0.12, -.65, 0.0);
   ctm = mult(tm, ctm);
   ctm = mult(pm, ctm);
   gl.uniformMatrix4fv(u_ctmLoc, false, flatten(ctm));
@@ -359,7 +394,7 @@ function drawFlippers()
 
   var squareMat = mat4();
 
-  sm = scalem(0.06, .01, 0);
+  sm = scalem(0.07, .01, 0);
   //tm = translate(-.162, -0.80, 0);
 
   ctm = mult(tm_fl, sm);
@@ -373,7 +408,7 @@ function drawFlippers()
 
     //drawSquare(vec3(.3, .3, .3), ctm);
 
-  sm = scalem(0.06, .01, 0);
+  sm = scalem(0.07, .01, 0);
   //tm = translate(0.01, -0.80, 0);
   ctm = mult(tm_fr, sm);
   ctm = mult(rm_fr, ctm);
@@ -411,36 +446,76 @@ function animate () {
     xCenter += xVelocity;
     yCenter += yVelocity;
 
+    yVelocity -= 0.000135;
+    if (yVelocity < 0.005 && release_change){
+        xVelocity = -0.00625;
+        release_change = false;
+    }
+    
+
     // check if xCenter/yCenter is out of bound (use extend),
     // if yes, keep it in bound and reverse the xVelocity/yVelocity
     // write your code here
-    if (xCenter + 0.95 >= 1.00){
-      xCenter = extend;
-      xVelocity *= -1.0;
+    // if (xCenter + 0.05 >= 0.65*0.9 && !latch_close){
+    // //   xCenter = extend;
+    //   xVelocity *= -1.0;
+
+    // }
+    if (xCenter + 0.05 >= 0.45 && latch_close){
+        //   xCenter = extend;
+          xVelocity *= -0.95;
+    
+    }
+    if (xCenter - 0.05 <= -0.65*0.9){
+    //   xCenter = -1.0 * extend;
+      xVelocity *= -0.95;
 
     }
-    if (xCenter - 0.95 <= -1.00){
-      xCenter = -1.0 * extend;
-      xVelocity *= -1.0;
-
-    }
-    if (yCenter + 0.95 >= 1.00){
-      yCenter = extend;
+    if (yCenter + 0.05 >= 0.9*0.9){
+    //   yCenter = extend;
       yVelocity *= -1.0;
 
     }
-    if (yCenter - 0.95 <= -1.00){
-      yCenter = -1.0 * extend;
-      yVelocity *= -1.0;
-
+    if (yCenter - 0.05 <= -0.9*0.9){
+    //   yCenter = -1.0 * extend;
+      
+      var angle_in = Math.atan2(yVelocity, xVelocity);
+      var angle_out;
+      if (xCenter < 0){
+        angle_out = angleReflect(angle_in, 340);
+        if (xVelocity<0){
+            xVelocity *= -(Math.cos(angle_out)+0.5);
+        }
+        else{
+            xVelocity *= 0.5+Math.cos(angle_out);
+        }
+      }
+      if (xCenter > 0){
+        console.log("Hello");
+        angle_out = angleReflect(angle_in, 340);
+        if (xVelocity<0){
+            xVelocity *= 1-Math.cos(angle_out);
+        }
+        else{
+            xVelocity *= -(-Math.cos(angle_out)+1);
+        }
+      }
+      xVelocity *= 0.95;
+      yVelocity *= Math.sin(angle_out);
+    //   xVelocity *= -0.95;
+      yVelocity *= -0.85;
     }
 
 }
+function angleReflect(incidenceAngle, surfaceAngle){
+    var a = surfaceAngle * 2 - incidenceAngle;
+    return a >= 360 ? a - 360 : a < 0 ? a + 360 : a;
+}
 var render = function()
 {
-
-
     requestAnimFrame(render);
-
+    if (release_bool){
+        animate();
+    }
     drawAll();
 }
