@@ -19,6 +19,7 @@ var triangleVertexPositionBuffer;
 var CommonMVMatrix;
 var nonCommonMVMatrix;
 var mvMatrix;
+var click = 0;
 
 var rm_fl;
 var tm_fl;
@@ -130,10 +131,12 @@ window.onload = function init()
         if (event.key=="ArrowLeft"){
             tm_fl = translate(-.49, -0.43, 0);
             rm_fl = rotateZ(30);
+            click = 1;
         }
         else if (event.key=="ArrowRight"){
             rm_fr = rotateZ(-30);
             tm_fr = translate(.369, -0.503, 0);
+            click = 1;
         }
     });
     window.addEventListener("keyup", function(event){
@@ -297,12 +300,12 @@ function drawCourt()
     tm = translate(-.35, 0.75, 0);
     ctm = mult(rm, ctm);
     ctm = mult(tm, ctm);
-    drawSquare(vec3(0,0,1), ctm);
+    //drawSquare(vec3(0,0,1), ctm);
     rm = rotateZ(270);
     tm = translate(-.33, 0.21, 0);
     ctm = mult(rm, ctm);
     ctm = mult(tm, ctm);
-    drawSquare(vec3(0,0,1), ctm);
+    //drawSquare(vec3(0,0,1), ctm);
 
 
 
@@ -338,7 +341,7 @@ function drawBall()
 {
     // nonCommonMVMatrix = scalem(1, 1, 1);
 
-    drawCircle(vec3(0.5, 0.5, 0.5));
+    drawCircle(vec3(1, 0, 1));
 }
 function drawFlippers()
 {
@@ -468,10 +471,41 @@ function animate () {
       xVelocity *= -0.95;
 
     }
+
     if (yCenter + 0.05 >= 0.9*0.9){
     //   yCenter = extend;
       yVelocity *= -1.0;
 
+    }
+
+    if(-0.45 < xCenter && xCenter < -0.27 && yCenter > -0.12 && yCenter < 0.1){ // left green box
+      yVelocity *= -.95;
+      xVelocity *= -1.02;
+    }
+    if(0.11 < xCenter && xCenter< 0.3 && yCenter > -0.12 && yCenter < 0.1){ // right green box
+      yVelocity *= -.95;
+      xVelocity *= -1.02;
+    }
+    if(-0.025 < xCenter && xCenter< 0.135 && -0.6 > yCenter && yCenter > -0.67){ //right flipper no onclick
+      //xVelocity *= -1;
+      yVelocity *= -.95;
+    }
+    if(-0.025 < xCenter && xCenter< 0.135 && -0.55 > yCenter && yCenter > -0.67 && click == 1){ //right flipper onclick
+      //xVelocity *= -1;
+      yVelocity *= -1.5;
+      click = 0;
+    }
+    if(-0.275 < xCenter && xCenter < -0.125 && -0.6 > yCenter && yCenter > -0.67){ //left flipper no onclick
+      //xVelocity *= -1;
+      yVelocity *= -.95;
+    }
+    if(-0.275 < xCenter && xCenter < -0.125 && -0.55 > yCenter && yCenter > -0.67 && click == 1){ //left flipper onclick
+      //xVelocity *= -1;
+      yVelocity *= -1.5;
+      click = 0;
+    }
+    if(-0.277 < xCenter && xCenter < 0.137 && yCenter < -0.71){
+      alert('you lose!...refresh page');
     }
     if (yCenter - 0.05 <= -0.9*0.9){
     //   yCenter = -1.0 * extend;
@@ -497,6 +531,8 @@ function animate () {
             xVelocity *= -(-Math.cos(angle_out)+1);
         }
       }
+
+
       xVelocity *= 0.95;
       yVelocity *= Math.sin(angle_out);
     //   xVelocity *= -0.95;
