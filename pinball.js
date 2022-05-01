@@ -113,7 +113,7 @@ window.onload = function init()
     //       rm_fl = rotateZ(-10);
     //       tm_fl = translate(-.09, -0.688, 0);
     //     }
-  
+
     //     }
     //   document.getElementById("Right").onclick = function(){
     //     countr = countr + 1;
@@ -297,26 +297,14 @@ function drawCourt()
     tm = translate(-.35, 0.75, 0);
     ctm = mult(rm, ctm);
     ctm = mult(tm, ctm);
-    drawTriangle(vec3(.4,0,0), ctm);
+    drawSquare(vec3(0,0,1), ctm);
     rm = rotateZ(270);
     tm = translate(-.33, 0.21, 0);
     ctm = mult(rm, ctm);
     ctm = mult(tm, ctm);
-    drawTriangle(vec3(.4,0,0), ctm);
+    drawSquare(vec3(0,0,1), ctm);
 
-    sm = scalem(0.2, 0.1, 0);
-    tm = translate(-.4, -.72, 0);
-    ctm = mult(sm, squareMat);
-    ctm = mult(tm, ctm);
-    drawTriangle(vec3(207/255, 185/255, 151/255), ctm);
 
-    rm = rotateZ(90);
-    sm = scalem(0.12, 0.22, 0);
-    tm = translate(.25, -.72, 0);
-    ctm = mult(sm, squareMat);
-    ctm = mult(rm, ctm);
-    ctm = mult(tm, ctm);
-    drawTriangle(vec3(207/255, 185/255, 151/255), ctm);
 
 
     if ((!release_change && yCenter < 0.65) || latch_close) {
@@ -392,6 +380,9 @@ function drawFlippers()
 
 
 
+
+
+
   var squareMat = mat4();
 
   sm = scalem(0.07, .01, 0);
@@ -413,6 +404,12 @@ function drawFlippers()
   ctm = mult(tm_fr, sm);
   ctm = mult(rm_fr, ctm);
   drawSquare(vec3(.3, .3, .3), ctm);
+
+  sm = scalem(0.455, .18, 0);
+  tm = translate(-0.16, -4.32, 0);
+  ctm = mult(tm, sm);
+  ctm = mult(sm, ctm);
+  drawSquare(vec3(1, 0, 0), ctm);
 
 
 
@@ -451,7 +448,7 @@ function animate () {
         xVelocity = -0.00625;
         release_change = false;
     }
-    
+
 
     // check if xCenter/yCenter is out of bound (use extend),
     // if yes, keep it in bound and reverse the xVelocity/yVelocity
@@ -464,7 +461,7 @@ function animate () {
     if (xCenter + 0.05 >= 0.45 && latch_close){
         //   xCenter = extend;
           xVelocity *= -0.95;
-    
+
     }
     if (xCenter - 0.05 <= -0.65*0.9){
     //   xCenter = -1.0 * extend;
@@ -478,7 +475,7 @@ function animate () {
     }
     if (yCenter - 0.05 <= -0.9*0.9){
     //   yCenter = -1.0 * extend;
-      
+
       var angle_in = Math.atan2(yVelocity, xVelocity);
       var angle_out;
       if (xCenter < 0){
